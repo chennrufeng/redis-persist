@@ -18,4 +18,3 @@ go install app
 hset key1 v1 1
 rename key1 key2
 ```
-
