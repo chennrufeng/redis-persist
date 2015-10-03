@@ -324,20 +324,17 @@ func dump(ud interface{}, args []string) (result string, err error) {
 
 // 将DB中的所有数据都DUMP出来
 func dump_db(ud interface{}, args []string) (result string, err error) {
-	context := ud.(*Context)
-	db := context.db
-	it := db.NewIterator()
-	defer it.Close()
-
-	i := 0
-	buf := bytes.NewBufferString("")
-	for ; it.Valid(); it.Next() {
-		fmt.Fprintf(buf, "{k%d:{'key':'%s'", i, string(it.Key()))
-		fmt.Fprintf(buf, "'value':'%s'}\n", string(it.Value()))
-
-		i++
-	}
-	result = buf.String()
+    context := ud.(*Context)
+    db := context.db
+    it := db.NewIterator()
+    defer it.Close()
+    
+    buf := bytes.NewBufferString("{\n")
+    for it.SeekToFirst(); it.Valid(); it.Next() {
+        fmt.Fprintf(buf, "{'key':'%s'", (string(it.Key())))
+        fmt.Fprintf(buf, ",'value':'%s'}\n", (string(it.Value())))
+    }
+    result = buf.String() + "}\n" 
 	return
 }
 
@@ -358,6 +355,7 @@ func restore(ud interface{}, key string, cli *redis.Redis) (err error) {
 	var leveldb_data map[string]string
 	err = json.Unmarshal(chunk, &leveldb_data)
 	if err != nil {
+        Error("chunk is not json:%s", key)
 		return
 	}
 	redis_data := make(map[string]string)
@@ -430,7 +428,7 @@ func restore_all(ud interface{}, args []string) (result string, err error) {
 		if count%100 == 0 {
 			Info("progress:%d, restore:%d", count, restore_count)
 		}
-	}
+    }
 	result = fmt.Sprintf("restore key %d, total %d\n", restore_count, count)
 	return
 }

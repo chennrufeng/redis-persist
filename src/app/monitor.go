@@ -93,7 +93,9 @@ func (m *Monitor) Start(queue chan string) {
 				break
 			}
 		}
+        Info ("monitor %s", "ssss")
 		if data, ok := resp.([]string); ok {
+            Info("monitor reps :%s", data)
 			if len(data) != 3 || data[0] != "message" {
 				Error("receive unexpected message, %v", data)
 			} else {
@@ -125,7 +127,7 @@ func (m *Monitor) Stop() {
 
 func NewMonitor() *Monitor {
 	cli := redis.NewRedis(setting.Redis.Host, setting.Redis.Password, setting.Redis.Db)
-	notification_config := "gE"
+	notification_config := "KEA"
 	event := fmt.Sprintf("__keyevent@%d__:%s", setting.Redis.Db, setting.Redis.Event)
 	return &Monitor{cli, notification_config, event, 0, false, make(chan int)}
 }

@@ -13,10 +13,10 @@ var INDEX_KEY_START = []byte("|")
 var INDEX_KEY_END = []byte{'|', 0xff}
 
 // DB中KEY开始字节
-var KEY_START = []byte("uid:")
+var KEY_START = []byte("user:")
 
 // DB中KEY结束字节
-var KEY_END = []byte{'u', 'i', 'd', ':', 0xff}
+var KEY_END = []byte{'u', 's', 'e', 'r', ':', 0xff}
 
 func indexKey(key string) string {
 	return INDEX_KEY_PREFIX + key

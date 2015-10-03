@@ -1,14 +1,14 @@
 {
     "redis":{
-        "host":"172.16.100.205:3536",
-        "password":"foobared",
-        "db":2,
-        "event":"rename_to",
+        "host":"127.0.0.1:6379",
+        "password":"",
+        "db":0,
+        "event":"hset",
         "expire": false
     },
 
     "leveldb":{
-        "dbname":"./data/redis6"
+        "dbname":"./data/leveldb"
     },
 
     "manager":{
@@ -17,7 +17,7 @@
 
     "log":{
         "file":"/tmp/land1.log",
-        "level" : 3
+        "level" :5 
     },
 
     "agent":{
