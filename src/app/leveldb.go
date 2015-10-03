@@ -1,3 +1,6 @@
+/*
+leveldb 接口
+*/
 package main
 
 import (
@@ -31,7 +34,7 @@ func (self *Leveldb) BatchPut(args ...[]byte) error {
 	batch := levigo.NewWriteBatch()
 	defer batch.Close()
 
-	for i := 0; i < sz-1; i++ {
+	for i := 0; i < sz-1; i = i + 2 {
 		batch.Put(args[i], args[i+1])
 	}
 	return self.db.Write(self.woptions, batch)
@@ -91,7 +94,7 @@ func NewLeveldb(name string) *Leveldb {
 	options.SetParanoidChecks(false)
 	options.SetWriteBufferSize(128 << 20)
 	options.SetMaxOpenFiles(2000)
-	options.SetBlockSize(4 * 1024)
+	options.SetBlockSize(8 * 1024)
 	options.SetBlockRestartInterval(16)
 	options.SetCompression(levigo.SnappyCompression)
 

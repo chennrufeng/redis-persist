@@ -1,3 +1,6 @@
+/*
+存储服务， 收到CHANNEL通知来的REDIS事件，以KEY查询出REDIS数据，并写入数据库
+*/
 package main
 
 import (
@@ -14,6 +17,7 @@ type Storer struct {
 	db  *Leveldb
 }
 
+// 连接数据库
 func (s *Storer) reconnect() {
 	times := 0
 	for {
@@ -36,12 +40,14 @@ func (s *Storer) reconnect() {
 	}
 }
 
+// 重试连接保存
 func (s *Storer) retry(key string, err error) {
 	Error("recv message failed, try to reconnect to redis:%v", err)
 	s.reconnect()
 	s.save(key)
 }
 
+// 设置REDIS中，KEY的过期时间
 func (s *Storer) expire(key string, resp map[string]string) {
 	value, ok := resp["expire"]
 	if !ok {
@@ -57,6 +63,7 @@ func (s *Storer) expire(key string, resp map[string]string) {
 	}
 }
 
+// 保存数据到DB
 func (s *Storer) save(key string) {
 	name, err := s.cli.Type(key)
 	if err != nil {
@@ -90,7 +97,7 @@ func (s *Storer) save(key string) {
 		return
 	}
 
-	// expire key
+	// expire key；如果配置过期，会修改REDIS的KEY过期时间
 	if setting.Redis.Expire {
 		s.expire(key, resp)
 	}
@@ -120,6 +127,7 @@ func NewStorer(db *Leveldb) *Storer {
 	return &Storer{cli, db}
 }
 
+// 存储器管理器，实现多存储器管理，并行写入DB
 type StorerMgr struct {
 	instances []*Storer
 	queues    []chan string

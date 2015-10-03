@@ -1,3 +1,6 @@
+/*
+log 接口
+*/
 package main
 
 import (

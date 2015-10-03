@@ -1,3 +1,6 @@
+/*
+监控服务， 用于订阅REDIS事件， 并将KEY字串发送到CHANNEL中
+*/
 package main
 
 import (
@@ -16,6 +19,7 @@ type Monitor struct {
 	quit_chan           chan int
 }
 
+// 订阅REDIS事件
 func (m *Monitor) subscribe() error {
 	config_key := "notify-keyspace-events"
 	_, err := m.cli.Exec("config", "set", config_key, m.notification_config)
@@ -33,6 +37,7 @@ func (m *Monitor) subscribe() error {
 	return nil
 }
 
+// 连接REDIS
 func (m *Monitor) reconnect() bool {
 	times := 0
 	for {

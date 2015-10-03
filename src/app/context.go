@@ -1,3 +1,4 @@
+//上下文命令实现
 package main
 
 import (
@@ -321,6 +322,25 @@ func dump(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 将DB中的所有数据都DUMP出来
+func dump_db(ud interface{}, args []string) (result string, err error) {
+	context := ud.(*Context)
+	db := context.db
+	it := db.NewIterator()
+	defer it.Close()
+
+	i := 0
+	buf := bytes.NewBufferString("")
+	for ; it.Valid(); it.Next() {
+		fmt.Fprintf(buf, "{k%d:{'key':'%s'", i, string(it.Key()))
+		fmt.Fprintf(buf, "'value':'%s'}\n", string(it.Value()))
+
+		i++
+	}
+	result = buf.String()
+	return
+}
+
 func restore(ud interface{}, key string, cli *redis.Redis) (err error) {
 	context := ud.(*Context)
 	db := context.db
@@ -517,6 +537,7 @@ func (context *Context) Register(c *CmdService) {
 	c.Register("sync", context, sync_one)
 	c.Register("sync_all", context, sync_all)
 	c.Register("dump", context, dump)
+	c.Register("dump_db", context, dump_db)
 	c.Register("count", context, count)
 	c.Register("diff", context, diff)
 	c.Register("shutdown", context, shutdown)
@@ -525,6 +546,7 @@ func (context *Context) Register(c *CmdService) {
 	c.Register("fast_check", context, fast_check)
 	c.Register("restore_one", context, restore_one)
 	c.Register("restore_all", context, restore_all)
+
 }
 
 func GetRedisConnection() (cli *redis.Redis, err error) {

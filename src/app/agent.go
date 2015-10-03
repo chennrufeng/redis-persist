@@ -1,3 +1,6 @@
+/*
+接口操作代理
+*/
 package main
 
 import (
@@ -9,6 +12,7 @@ import (
 	"sync"
 )
 
+// 接口声明
 type AgentHandler func(ud interface{}, params interface{}) (interface{}, error)
 
 type AgentSvr struct {
@@ -30,6 +34,7 @@ type Response struct {
 	Error  interface{} `json:"error"`
 }
 
+// 分发请求；响应请求命令
 func (self *AgentSvr) dispatchRequst(conn *net.TCPConn, req *Request) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -65,6 +70,7 @@ func (self *AgentSvr) dispatchRequst(conn *net.TCPConn, req *Request) {
 	}
 }
 
+// 分配连接处理
 func (self *AgentSvr) handleConnection(conn *net.TCPConn) {
 	defer conn.Close()
 	defer self.wg.Done()
@@ -134,10 +140,12 @@ func (self *AgentSvr) Stop() {
 	self.wg.Wait()
 }
 
+// 注册命令
 func (self *AgentSvr) Register(cmd string, ud interface{}, handler AgentHandler) {
 	self.handers[cmd] = []interface{}{ud, handler}
 }
 
+// 查询DB中，指定KEY数据命令
 func handlerGet(ud interface{}, params interface{}) (result interface{}, err error) {
 	agent := ud.(*AgentSvr)
 	key := params.(string)

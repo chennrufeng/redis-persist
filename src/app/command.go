@@ -1,3 +1,6 @@
+/*
+命令服务
+*/
 package main
 
 import (
@@ -9,6 +12,7 @@ import (
 	"time"
 )
 
+// 命令声明
 type CmdHandler func(ud interface{}, args []string) (string, error)
 
 type CmdService struct {
@@ -18,6 +22,9 @@ type CmdService struct {
 	wg       sync.WaitGroup
 }
 
+// 分配的命令连接处理
+// 请求命令，命令名字与参数是空格分隔；以换行符结束
+// 例 dump uid:123
 func (c *CmdService) handleConnection(conn net.Conn) {
 	defer conn.Close()
 	defer c.wg.Done()
@@ -66,6 +73,7 @@ func (c *CmdService) handleConnection(conn net.Conn) {
 	Info("end handle conn:%v", conn)
 }
 
+// 注册命令
 func (c *CmdService) Register(cmd string, ud interface{}, handler CmdHandler) {
 	_, ok := c.handlers[cmd]
 	if handler == nil && ok {
