@@ -102,7 +102,7 @@ func (s *Storer) save(key string) {
 		s.expire(key, resp)
 	}
 
-	Info("save key:%s, data len:%d", key, len(chunk))
+	Info("save key:%s, data len:%d, data:%s", key, len(chunk), chunk)
 	return
 }
 
