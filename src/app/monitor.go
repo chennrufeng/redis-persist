@@ -93,9 +93,9 @@ func (m *Monitor) Start(queue chan string) {
 				break
 			}
 		}
-        Info ("monitor %s", "ssss")
+
 		if data, ok := resp.([]string); ok {
-            Info("monitor reps :%s", data)
+			Info("monitor reps :%s", data)
 			if len(data) != 3 || data[0] != "message" {
 				Error("receive unexpected message, %v", data)
 			} else {
@@ -107,8 +107,8 @@ func (m *Monitor) Start(queue chan string) {
 				qlen := len(queue)
 				if qlen > m.qlen {
 					Error("queue grow, current length:%d", qlen)
+					m.qlen = qlen
 				}
-				m.qlen = qlen
 			}
 		} else {
 			Error("receive unexpected message, %v", resp)
