@@ -69,7 +69,10 @@ func readResponse(reader *bufio.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if len(line) < 3 {
+		err = errors.New("not read enough data.")
+		return nil, err
+	}
 	content := line[1 : len(line)-2]
 	switch line[0] {
 	case '-':
