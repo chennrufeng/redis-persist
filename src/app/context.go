@@ -14,6 +14,7 @@ import (
 	"strings"
 )
 
+// 查询所有命令
 func help(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	c := context.c
@@ -24,6 +25,7 @@ func help(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 设置运行核心线程数量；返回核心线程数
 func procs(ud interface{}, args []string) (result string, err error) {
 	count := 0
 	if len(args) > 0 {
@@ -41,6 +43,7 @@ func procs(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 退出
 func shutdown(ud interface{}, args []string) (result string, err error) {
 	passwd := ""
 	if len(args) > 0 {
@@ -58,6 +61,7 @@ func shutdown(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 查询某个ID数据
 func info(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	db := context.db
@@ -70,6 +74,7 @@ func info(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 持久化指定KEY
 func sync_one(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	sync_queue := context.sync_queue
@@ -82,6 +87,7 @@ func sync_one(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 持久化所有KEY
 func sync_all(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	sync_queue := context.sync_queue
@@ -112,6 +118,7 @@ func sync_all(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 统计LEVELDB中KEY的数量
 func count(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	db := context.db
@@ -126,6 +133,7 @@ func count(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 将LEVELDB与REDIS进行比较
 func check(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	cli, err := GetRedisConnection()
@@ -213,6 +221,7 @@ func check(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+//快速比较
 func fast_check(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	cli, err := GetRedisConnection()
@@ -290,6 +299,7 @@ func fast_check(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 将指定KEY的数据，从LEVELDB中DUMP出来
 func dump(ud interface{}, args []string) (result string, err error) {
 	if len(args) == 0 {
 		err = errors.New("no key")
@@ -324,20 +334,21 @@ func dump(ud interface{}, args []string) (result string, err error) {
 
 // 将DB中的所有数据都DUMP出来
 func dump_db(ud interface{}, args []string) (result string, err error) {
-    context := ud.(*Context)
-    db := context.db
-    it := db.NewIterator()
-    defer it.Close()
-    
-    buf := bytes.NewBufferString("{\n")
-    for it.SeekToFirst(); it.Valid(); it.Next() {
-        fmt.Fprintf(buf, "{'key':'%s'", (string(it.Key())))
-        fmt.Fprintf(buf, ",'value':'%s'}\n", (string(it.Value())))
-    }
-    result = buf.String() + "}\n" 
+	context := ud.(*Context)
+	db := context.db
+	it := db.NewIterator()
+	defer it.Close()
+
+	buf := bytes.NewBufferString("{\n")
+	for it.SeekToFirst(); it.Valid(); it.Next() {
+		fmt.Fprintf(buf, "{'key':'%s'", (string(it.Key())))
+		fmt.Fprintf(buf, ",'value':'%s'}\n", (string(it.Value())))
+	}
+	result = buf.String() + "}\n"
 	return
 }
 
+// LEVELDB恢复到REDIS的具体实现
 func restore(ud interface{}, key string, cli *redis.Redis) (err error) {
 	context := ud.(*Context)
 	db := context.db
@@ -355,7 +366,7 @@ func restore(ud interface{}, key string, cli *redis.Redis) (err error) {
 	var leveldb_data map[string]string
 	err = json.Unmarshal(chunk, &leveldb_data)
 	if err != nil {
-        Error("chunk is not json:%s", key)
+		Error("chunk is not json:%s", key)
 		return
 	}
 	redis_data := make(map[string]string)
@@ -385,6 +396,7 @@ func restore(ud interface{}, key string, cli *redis.Redis) (err error) {
 	return
 }
 
+// 将LEVELDB中指定ID数据恢复到REDIS
 func restore_one(ud interface{}, args []string) (result string, err error) {
 	if len(args) < 1 {
 		err = errors.New("restore need one argument")
@@ -405,6 +417,7 @@ func restore_one(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 将LEVELDB中的所有数据恢复到REDIS中
 func restore_all(ud interface{}, args []string) (result string, err error) {
 	context := ud.(*Context)
 	db := context.db
@@ -428,11 +441,12 @@ func restore_all(ud interface{}, args []string) (result string, err error) {
 		if count%100 == 0 {
 			Info("progress:%d, restore:%d", count, restore_count)
 		}
-    }
+	}
 	result = fmt.Sprintf("restore key %d, total %d\n", restore_count, count)
 	return
 }
 
+// 返回LEVELDB所有KEY
 func keys(ud interface{}, args []string) (result string, err error) {
 	start := 0
 	count := 10
@@ -467,6 +481,7 @@ func keys(ud interface{}, args []string) (result string, err error) {
 	return
 }
 
+// 差异比较
 func diff(ud interface{}, args []string) (result string, err error) {
 	if len(args) == 0 {
 		err = errors.New("no key")

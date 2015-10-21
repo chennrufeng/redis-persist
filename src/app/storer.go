@@ -82,6 +82,10 @@ func (s *Storer) save(key string) {
 		s.retry(key, err)
 		return
 	}
+	if _, ok := resp["version"]; !ok {
+		//Error(key, " has not version field.")
+		return
+	}
 
 	chunk, err := json.Marshal(resp)
 	if err != nil {
